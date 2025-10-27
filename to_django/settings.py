@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,10 +23,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-ue5)#qg3gq_x9elb=crfu!56kcljkh6y$1jn1q#0!e(te-5%1d"
 
+
+REDIS_URL = os.environ.get("REDIS_URL", "redis://127.0.0.1:6379")
+
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [to_django.onrender.com]
 
 
 # Application definition
@@ -77,8 +82,10 @@ ASGI_APPLICATION = "to_django.wsgi.application"
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {"hosts": [("127.0.0.1", 6379)]},
-    }
+        "CONFIG": {
+            "hosts": [REDIS_URL],
+        },
+    },
 }
 
 # Database
