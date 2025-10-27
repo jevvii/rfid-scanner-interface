@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>SMSentry</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family:
+                    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                    "Helvetica Neue", Arial, sans-serif;
+            }
+
+            h1 {
+                font-size: 3rem;
+                font-weight: 700;
+            }
+
+            p {
+                font-size: 1rem;
+            }
+
+            .card {
+                border-radius: 0.5rem;
+                border: 1px solid #e5e7eb;
+                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            }
+
+            .pulse-ring {
+                position: absolute;
+                inset: 0;
+                border-radius: 50%;
+                background: rgba(220, 38, 38, 0.2);
+                animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+
+            .pulse-ring-2 {
+                animation-delay: 0.5s;
+            }
+
+            @keyframes pulse {
+                0%,
+                100% {
+                    transform: scale(1);
+                    opacity: 0.5;
+                }
+                50% {
+                    transform: scale(1.5);
+                    opacity: 0;
+                }
+            }
+
+            @keyframes pulse2 {
+                0%,
+                100% {
+                    transform: scale(1);
+                    opacity: 0.3;
+                }
+                50% {
+                    transform: scale(1.8);
+                    opacity: 0;
+                }
+            }
+
+            .pulse-ring-2 {
+                animation-name: pulse2;
+            }
+
+            .rotate-animation {
+                animation: rotate 2s linear infinite;
+            }
+
+            @keyframes rotate {
+                from {
+                    transform: rotate(0deg);
+                }
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .scale-in {
+                animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+
+            @keyframes scaleIn {
+                from {
+                    transform: scale(0);
+                }
+                to {
+                    transform: scale(1);
+                }
+            }
+
+            .scale-rotate-in {
+                animation: scaleRotateIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+
+            @keyframes scaleRotateIn {
+                from {
+                    transform: scale(0) rotate(-180deg);
+                }
+                to {
+                    transform: scale(1) rotate(0deg);
+                }
+            }
+
+            .shake {
+                animation: shake 0.5s ease-in-out;
+                animation-iteration-count: 2;
+            }
+
+            @keyframes shake {
+                0%,
+                100% {
+                    transform: scale(1);
+                }
+                33% {
+                    transform: scale(1.1);
+                }
+                66% {
+                    transform: scale(1);
+                }
+            }
+
+            .bounce-scale {
+                animation: bounceScale 1s ease-in-out infinite;
+            }
+
+            @keyframes bounceScale {
+                0%,
+                100% {
+                    transform: scale(1);
+                }
+                50% {
+                    transform: scale(1.1);
+                }
+            }
+
+            .fade-up {
+                animation: fadeUp 0.3s ease-out;
+            }
+
+            @keyframes fadeUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .blink {
+                animation: blink 0.8s ease-in-out infinite;
+            }
+
+            @keyframes blink {
+                0%,
+                100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.3;
+                }
+            }
+
+            .icon {
+                width: 120px;
+                height: 120px;
+                stroke-width: 1.5;
+            }
+
+            .icon-small {
+                width: 40px;
+                height: 40px;
+                stroke-width: 1.5;
+            }
+
+            .icon-arrow {
+                width: 24px;
+                height: 24px;
+            }
+
+            .transition-all {
+                transition: all 0.3s ease;
+            }
+
+            .step-card {
+                min-width: 140px;
+            }
+        </style>
+    </head>
+    <body class="min-h-screen bg-gradient-to-br from-red-50 to-red-100">
+        <div
+            class="flex flex-col items-center justify-between p-8 min-h-screen"
+        >
+            <!-- Header -->
+            <div class="w-full max-w-4xl">
+                <h1 class="text-center text-red-900 mb-2 text-5xl">SMSentry</h1>
+                <p class="text-center text-red-700">Please scan your ID card</p>
+            </div>
+
+            <!-- Scanner Display -->
+            <div class="flex flex-col items-center gap-8">
+                <div
+                    id="scannerCard"
+                    class="card w-80 h-80 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm border-2 cursor-pointer hover:border-red-500 transition-colors"
+                >
+                    <div class="relative">
+                        <!-- Pulse rings -->
+                        <div id="pulseRings" class="pulse-rings">
+                            <div class="pulse-ring"></div>
+                            <div class="pulse-ring pulse-ring-2"></div>
+                        </div>
+
+                        <!-- Main icon -->
+                        <div
+                            id="mainIcon"
+                            class="relative text-gray-400 transition-all"
+                        >
+                            <!-- Credit Card Icon (default) -->
+                            <svg
+                                id="cardIcon"
+                                class="icon"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <rect
+                                    width="20"
+                                    height="14"
+                                    x="2"
+                                    y="5"
+                                    rx="2"
+                                />
+                                <line x1="2" x2="22" y1="10" y2="10" />
+                            </svg>
+                            <!-- Radio Icon (scanning) -->
+                            <svg
+                                id="radioIcon"
+                                class="icon hidden"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9" />
+                                <path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5" />
+                                <circle cx="12" cy="12" r="2" />
+                                <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5" />
+                                <path d="M19.1 4.9C23 8.8 23 15.1 19.1 19" />
+                            </svg>
+                            <!-- Check Circle Icon (success) -->
+                            <svg
+                                id="checkIcon"
+                                class="icon hidden"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                <path d="m9 11 3 3L22 4" />
+                            </svg>
+                            <!-- X Circle Icon (error) -->
+                            <svg
+                                id="errorIcon"
+                                class="icon hidden"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="m15 9-6 6" />
+                                <path d="m9 9 6 6" />
+                            </svg>
+                            <!-- Clock Icon (cooldown) -->
+                            <svg
+                                id="clockIcon"
+                                class="icon hidden"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 16 14" />
+                            </svg>
+                            <!-- Logout Icon (logout-success) -->
+                            <svg
+                                id="logoutIcon"
+                                class="icon hidden"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"
+                                />
+                                <polyline points="16 17 21 12 16 7" />
+                                <line x1="21" x2="9" y1="12" y2="12" />
+                            </svg>
+                            <!-- Calendar Check Icon (attendance-complete) -->
+                            <svg
+                                id="calendarCheckIcon"
+                                class="icon hidden"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path d="M8 2v4" />
+                                <path d="M16 2v4" />
+                                <rect
+                                    width="18"
+                                    height="18"
+                                    x="3"
+                                    y="4"
+                                    rx="2"
+                                />
+                                <path d="M3 10h18" />
+                                <path d="m9 16 2 2 4-4" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <p id="statusMessage" class="mt-8 text-gray-400 fade-up">
+                        Ready to Scan
+                    </p>
+                </div>
+            </div>
+
+            <!-- Process Diagram -->
+            <div class="w-full max-w-4xl">
+                <div class="flex items-center justify-center gap-4">
+                    <!-- Step 1: Approach -->
+                    <div class="flex items-center">
+                        <div
+                            id="step0"
+                            class="card p-6 transition-all bg-white text-gray-400 border-gray-200 step-card"
+                        >
+                            <div class="flex flex-col items-center gap-3">
+                                <div id="icon0">
+                                    <svg
+                                        class="icon-small"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <circle cx="12" cy="8" r="5" />
+                                        <path d="M20 21a8 8 0 0 0-16 0" />
+                                    </svg>
+                                </div>
+                                <div class="text-center">
+                                    <p class="mb-1">Approach</p>
+                                    <p
+                                        class="text-sm text-gray-400"
+                                        id="stepDesc0"
+                                    >
+                                        Step up to the machine
+                                    </p>
+                                </div>
+                                <div class="flex gap-1">
+                                    <div
+                                        id="indicator0"
+                                        class="w-2 h-2 rounded-full bg-gray-300"
+                                    ></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <svg
+                            id="arrow0"
+                            class="mx-2 text-gray-300 icon-arrow"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="m9 18 6-6-6-6"
+                            />
+                        </svg>
+                    </div>
+
+                    <!-- Step 2: Scan Card -->
+                    <div class="flex items-center">
+                        <div
+                            id="step1"
+                            class="card p-6 transition-all bg-white text-gray-400 border-gray-200 step-card"
+                        >
+                            <div class="flex flex-col items-center gap-3">
+                                <div id="icon1">
+                                    <svg
+                                        class="icon-small"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <rect
+                                            width="20"
+                                            height="14"
+                                            x="2"
+                                            y="5"
+                                            rx="2"
+                                        />
+                                        <line x1="2" x2="22" y1="10" y2="10" />
+                                    </svg>
+                                </div>
+                                <div class="text-center">
+                                    <p class="mb-1">Scan Card</p>
+                                    <p
+                                        class="text-sm text-gray-400"
+                                        id="stepDesc1"
+                                    >
+                                        Place card on reader
+                                    </p>
+                                </div>
+                                <div class="flex gap-1">
+                                    <div
+                                        id="indicator1"
+                                        class="w-2 h-2 rounded-full bg-gray-300"
+                                    ></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <svg
+                            id="arrow1"
+                            class="mx-2 text-gray-300 icon-arrow"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="m9 18 6-6-6-6"
+                            />
+                        </svg>
+                    </div>
+
+                    <!-- Step 3: Confirmation -->
+                    <div class="flex items-center">
+                        <div
+                            id="step2"
+                            class="card p-6 transition-all bg-white text-gray-400 border-gray-200 step-card"
+                        >
+                            <div class="flex flex-col items-center gap-3">
+                                <div id="icon2">
+                                    <svg
+                                        class="icon-small"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            d="M22 11.08V12a10 10 0 1 1-5.93-9.14"
+                                        />
+                                        <path d="m9 11 3 3L22 4" />
+                                    </svg>
+                                </div>
+                                <div class="text-center">
+                                    <p class="mb-1">Confirmation</p>
+                                    <p
+                                        class="text-sm text-gray-400"
+                                        id="stepDesc2"
+                                    >
+                                        Wait for verification
+                                    </p>
+                                </div>
+                                <div class="flex gap-1">
+                                    <div
+                                        id="indicator2"
+                                        class="w-2 h-2 rounded-full bg-gray-300"
+                                    ></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const socket = new WebSocket(
+                "ws://" + window.location.host + "/ws/rfid/status/",
+            );
+
+            let scanStatus = "idle";
+            let currentStep = 0;
+            let isLoggedIn = false;
+            let lastScanTime = null;
+            let remainingTime = 0;
+            let attendanceComplete = false;
+
+            const COOLDOWN_PERIOD = 30000; // 30 seconds in milliseconds
+
+            const scannerCard = document.getElementById("scannerCard");
+            const pulseRings = document.getElementById("pulseRings");
+            const mainIcon = document.getElementById("mainIcon");
+            const cardIcon = document.getElementById("cardIcon");
+            const radioIcon = document.getElementById("radioIcon");
+            const checkIcon = document.getElementById("checkIcon");
+            const errorIcon = document.getElementById("errorIcon");
+            const clockIcon = document.getElementById("clockIcon");
+            const logoutIcon = document.getElementById("logoutIcon");
+            const calendarCheckIcon =
+                document.getElementById("calendarCheckIcon");
+            const statusMessage = document.getElementById("statusMessage");
+
+            function setStatus(status, timeRemaining = 0) {
+                scanStatus = status;
+
+                // Hide all icons
+                cardIcon.classList.add("hidden");
+                radioIcon.classList.add("hidden");
+                checkIcon.classList.add("hidden");
+                errorIcon.classList.add("hidden");
+                clockIcon.classList.add("hidden");
+                logoutIcon.classList.add("hidden");
+                calendarCheckIcon.classList.add("hidden");
+
+                // Remove animations
+                cardIcon.classList.remove(
+                    "scale-in",
+                    "rotate-animation",
+                    "scale-rotate-in",
+                    "shake",
+                );
+                radioIcon.classList.remove(
+                    "scale-in",
+                    "rotate-animation",
+                    "scale-rotate-in",
+                    "shake",
+                );
+                checkIcon.classList.remove(
+                    "scale-in",
+                    "rotate-animation",
+                    "scale-rotate-in",
+                    "shake",
+                );
+                errorIcon.classList.remove(
+                    "scale-in",
+                    "rotate-animation",
+                    "scale-rotate-in",
+                    "shake",
+                );
+                clockIcon.classList.remove(
+                    "scale-in",
+                    "rotate-animation",
+                    "scale-rotate-in",
+                    "shake",
+                );
+                logoutIcon.classList.remove(
+                    "scale-in",
+                    "rotate-animation",
+                    "scale-rotate-in",
+                    "shake",
+                );
+                calendarCheckIcon.classList.remove(
+                    "scale-in",
+                    "rotate-animation",
+                    "scale-rotate-in",
+                    "shake",
+                );
+
+                switch (status) {
+                    case "idle":
+                        mainIcon.className =
+                            "relative text-gray-400 transition-all";
+                        cardIcon.classList.remove("hidden");
+                        pulseRings.style.display = "block";
+                        statusMessage.textContent = "Ready to Scan";
+                        statusMessage.className = "mt-8 text-gray-400 fade-up";
+                        break;
+                    case "scanning":
+                        mainIcon.className =
+                            "relative text-red-600 transition-all";
+                        radioIcon.classList.remove("hidden");
+                        radioIcon.classList.add("rotate-animation");
+                        pulseRings.style.display = "none";
+                        statusMessage.textContent = "Scanning...";
+                        statusMessage.className = "mt-8 text-red-600 fade-up";
+                        break;
+                    case "success":
+                        mainIcon.className =
+                            "relative text-green-500 transition-all";
+                        checkIcon.classList.remove("hidden");
+                        checkIcon.classList.add("scale-in");
+                        pulseRings.style.display = "none";
+                        statusMessage.textContent = "Logged In Successfully!";
+                        statusMessage.className = "mt-8 text-green-500 fade-up";
+                        break;
+                    case "logout-success":
+                        mainIcon.className =
+                            "relative text-green-500 transition-all";
+                        logoutIcon.classList.remove("hidden");
+                        logoutIcon.classList.add("scale-rotate-in");
+                        pulseRings.style.display = "none";
+                        statusMessage.textContent = "Logged Out Successfully!";
+                        statusMessage.className = "mt-8 text-green-500 fade-up";
+                        break;
+                    case "attendance-complete":
+                        mainIcon.className =
+                            "relative text-blue-500 transition-all";
+                        calendarCheckIcon.classList.remove("hidden");
+                        calendarCheckIcon.classList.add("scale-in");
+                        pulseRings.style.display = "none";
+                        statusMessage.textContent =
+                            "Attendance Complete for Today";
+                        statusMessage.className = "mt-8 text-blue-500 fade-up";
+                        break;
+                    case "cooldown":
+                        mainIcon.className =
+                            "relative text-red-700 transition-all";
+                        clockIcon.classList.remove("hidden");
+                        clockIcon.classList.add("shake");
+                        pulseRings.style.display = "none";
+                        statusMessage.textContent = `Please wait ${timeRemaining}s to logout`;
+                        statusMessage.className = "mt-8 text-red-700 fade-up";
+                        break;
+                    case "error":
+                        mainIcon.className =
+                            "relative text-red-500 transition-all";
+                        errorIcon.classList.remove("hidden");
+                        errorIcon.classList.add("scale-in");
+                        pulseRings.style.display = "none";
+                        statusMessage.textContent = "Scan Failed";
+                        statusMessage.className = "mt-8 text-red-500 fade-up";
+                        break;
+                }
+            }
+
+            function setStep(step) {
+                currentStep = step;
+
+                for (let i = 0; i < 3; i++) {
+                    const stepCard = document.getElementById(`step${i}`);
+                    const icon = document.getElementById(`icon${i}`);
+                    const stepDesc = document.getElementById(`stepDesc${i}`);
+                    const indicator = document.getElementById(`indicator${i}`);
+                    const arrow = document.getElementById(`arrow${i}`);
+
+                    const isActive = step >= i;
+                    const isCurrent = step === i;
+
+                    if (isActive) {
+                        stepCard.className =
+                            "card p-6 transition-all text-white step-card";
+                        stepCard.style.backgroundColor = "#800000";
+                        stepCard.style.borderColor = "#600000";
+                        stepDesc.className = "text-sm";
+                        stepDesc.style.opacity = "0.8";
+                        indicator.className = "w-2 h-2 rounded-full bg-white";
+                        if (arrow) {
+                            arrow.className = "mx-2 icon-arrow";
+                            arrow.style.color = "#800000";
+                        }
+                    } else {
+                        stepCard.className =
+                            "card p-6 transition-all bg-white text-gray-400 border-gray-200 step-card";
+                        stepCard.style.backgroundColor = "";
+                        stepCard.style.borderColor = "";
+                        stepDesc.className = "text-sm text-gray-400";
+                        stepDesc.style.opacity = "";
+                        indicator.className =
+                            "w-2 h-2 rounded-full bg-gray-300";
+                        if (arrow) {
+                            arrow.className = "mx-2 text-gray-300 icon-arrow";
+                            arrow.style.color = "";
+                        }
+                    }
+
+                    if (isCurrent) {
+                        icon.classList.add("bounce-scale");
+                        indicator.classList.add("blink");
+                    } else {
+                        icon.classList.remove("bounce-scale");
+                        indicator.classList.remove("blink");
+                    }
+                }
+            }
+
+            function handleScan() {
+                if (scanStatus !== "idle") return;
+
+                // Start scanning
+                setStatus("scanning");
+                setStep(1);
+
+                // Move to step 2
+                setTimeout(() => {
+                    setStep(2);
+
+                    // Show success
+                    setTimeout(() => {
+                        setStatus("success");
+                        setStep(2);
+
+                        // Reset
+                        setTimeout(() => {
+                            setStatus("idle");
+                            setStep(0);
+                        }, 2000);
+                    }, 1500);
+                }, 1000);
+                return;
+            }
+
+            function handleInvalidScan() {
+                if (scanStatus !== "idle" && scanStatus !== "scanning") return;
+
+                // Show error feedback
+                setStatus("error");
+                setStep(3);
+
+                // Reset after a short delay
+                setTimeout(() => {
+                    setStatus("idle");
+                    setStep(1);
+                }, 2000);
+                return;
+            }
+
+            function handleCooldownScan(remaining) {
+                if (scanStatus !== "idle" && scanStatus !== "scanning") return;
+
+                setStatus("cooldown", remaining);
+                setStep(3);
+
+                // Reset after showing error
+                setTimeout(() => {
+                    setStatus("idle");
+                    setStep(0);
+                }, 2000);
+                return;
+            }
+
+            function handleLogoutScan() {
+                if (scanStatus !== "idle" && scanStatus !== "scanning") return;
+
+                // Start scanning
+                setStatus("logout-success");
+                setStep(3);
+
+                // Reset
+                setTimeout(() => {
+                    setStatus("idle");
+                    setStep(0);
+                }, 2000);
+            }
+
+            function handleDoneScan() {
+                if (scanStatus !== "idle" && scanStatus !== "scanning") return;
+
+                // Start scanning
+                setStatus("scanning");
+                setStep(1);
+
+                // Move to step 2
+                setTimeout(() => {
+                    setStep(2);
+
+                    // Show success
+                    setTimeout(() => {
+                        setStatus("attendance-complete");
+                        setStep(2);
+
+                        // Reset
+                        setTimeout(() => {
+                            setStatus("idle");
+                            setStep(0);
+                        }, 2000);
+                    }, 1500);
+                }, 1000);
+                return;
+            }
+
+            socket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                console.log("WS Event:", data);
+
+                const msg = data.message?.toLowerCase();
+                const timeValue = parseFloat(data.time || 0);
+
+                switch (msg) {
+                    case "unknown":
+                        handleInvalidScan();
+                        break;
+
+                    case "cooldown":
+                        // Use backend time value if available (e.g., 125.5 seconds)
+                        const remaining = Math.ceil(timeValue);
+                        handleCooldownScan(remaining);
+                        break;
+
+                    case "logout":
+                        handleLogoutScan();
+                        break;
+
+                    case "done":
+                    case "complete":
+                        handleDoneScan();
+                        break;
+
+                    default:
+                        // Treat everything else (like a valid student name) as a valid scan
+                        handleScan();
+                        break;
+                }
+            };
+
+            scannerCard.addEventListener("click", handleScan);
+
+            // Initialize
+            setStatus("idle");
+            setStep(0);
+        </script>
+    </body>
+</html>
