@@ -22,5 +22,5 @@ from rfid_receiver import views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/rfid-data/", views.rfid_data),
-    path("monitor/", views.monitor_page),
+    path("", views.monitor_page),
 ]
