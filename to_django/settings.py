@@ -32,7 +32,10 @@ REDIS_URL = os.environ.get(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = [".onrender.com", "127.0.0.1"]
+ALLOWED_HOSTS = ["rfid-scanner-interface.onrender.com", "127.0.0.1"]
+CSRF_TRUSTED_ORIGINS = [
+    "https://rfid-scanner-interface.onrender.com",
+]
 
 
 # Application definition
