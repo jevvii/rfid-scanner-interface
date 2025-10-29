@@ -24,11 +24,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-ue5)#qg3gq_x9elb=crfu!56kcljkh6y$1jn1q#0!e(te-5%1d"
 
 
-REDIS_URL = os.environ.get("REDIS_URL", "redis://127.0.0.1:6379")
-
+REDIS_URL = os.environ.get(
+    "REDIS_URL",
+    "redis://default:AXYqAAIncDJhZjFhMzFlNzQ4ZjM0ZTEyYjM4OTkzNWMyZDE3Y2M5NXAyMzAyNTA@blessed-mouse-30250.upstash.io:6379",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [".onrender.com", "127.0.0.1"]
 
