@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-ue5)#qg3gq_x9elb=crfu!56kcljkh6y$1jn1q#0!e(te-5%1d
 
 REDIS_URL = os.environ.get(
     "REDIS_URL",
-    "redis://default:AXYqAAIncDJhZjFhMzFlNzQ4ZjM0ZTEyYjM4OTkzNWMyZDE3Y2M5NXAyMzAyNTA@blessed-mouse-30250.upstash.io:6379",
+    "rediss://default:AXYqAAIncDJhZjFhMzFlNzQ4ZjM0ZTEyYjM4OTkzNWMyZDE3Y2M5NXAyMzAyNTA@blessed-mouse-30250.upstash.io:6379",
 )
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -81,8 +81,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "to_django.wsgi.application"
-ASGI_APPLICATION = "to_django.wsgi.application"
+# WSGI_APPLICATION = "to_django.wsgi.application"
+ASGI_APPLICATION = "to_django.asgi.application"
 
 CHANNEL_LAYERS = {
     "default": {
