@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const socket = new WebSocket(
-        "ws://" + window.location.host + "/ws/rfid/status/",
+        "wss://" + window.location.host + "/ws/rfid/status/",
     );
 
     let scanStatus = "idle";
